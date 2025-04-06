@@ -1,0 +1,45 @@
+stages:
+  - lint
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_IMAGE: python:3.9
+
+lint:
+  stage: lint
+  tags:
+    - devops-test
+  script:
+    - echo "Running linter..."
+    - pip install flake8
+    - flake8 app.py
+
+build:
+  stage: build
+  tags:
+    - devops-test
+  script:
+    - echo "Building the application..."
+    - python --version
+    - pip install -r requirements.txt
+
+test:
+  stage: test
+  tags:
+    - devops-test
+  script:
+    - echo "Running tests..."
+    - pytest test_app.py
+
+deploy_staging:
+  stage: deploy
+  tags:
+    - devops-test
+  script:
+    - echo "Deploying to staging..."
+    - docker build -t my-app:latest .
+    - docker run -d --name my-app-staging my-app:latest
+  only:
+    - main
